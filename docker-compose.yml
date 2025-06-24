@@ -1,0 +1,47 @@
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: arxiv_postgres
+    environment:
+      POSTGRES_DB: arxiv_curator
+      POSTGRES_USER: curator
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-secretpassword}
+    volumes:
+      - ./volumes/postgres_data:/var/lib/postgresql/data
+      - ./database/init:/docker-entrypoint-initdb.d
+    ports:
+      - "5432:5432"
+    networks:
+      - curator-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U curator -d arxiv_curator"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  pipeline:
+    build: ./pipeline
+    container_name: arxiv_pipeline
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://curator:${POSTGRES_PASSWORD:-secretpassword}@postgres:5432/arxiv_curator
+      OLLAMA_HOST: ${OLLAMA_HOST:-http://host.docker.internal:11434}
+      OLLAMA_MODEL: ${OLLAMA_MODEL:-gemma2:9b}
+      PYTHONUNBUFFERED: 1
+    volumes:
+      - ./pipeline/src:/app
+      - ./volumes/logs:/logs
+    networks:
+      - curator-network
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    command: python -m main
+
+networks:
+  curator-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
