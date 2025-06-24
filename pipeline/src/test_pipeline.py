@@ -15,11 +15,11 @@ logger = logging.getLogger(__name__)
 def test_database_connection():
     """Test la connexion PostgreSQL"""
     try:
-        from sqlalchemy import create_engine
+        from sqlalchemy import create_engine, text
         db_url = os.getenv('DATABASE_URL', 'postgresql://curator:secretpassword@postgres:5432/arxiv_curator')
         engine = create_engine(db_url)
         with engine.connect() as conn:
-            result = conn.execute("SELECT 1")
+            result = conn.execute(text("SELECT 1"))
             logger.info("✅ Database connection: OK")
             return True
     except Exception as e:
