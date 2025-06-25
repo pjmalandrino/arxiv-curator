@@ -4,7 +4,7 @@ from sqlalchemy.exc import IntegrityError
 from typing import Dict, Optional
 import logging
 
-from .models import Base, Paper, Summary
+from models import Base, Paper, Summary
 
 logger = logging.getLogger(__name__)
 

@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+
+{% block title %}{{ paper.title }} - ArXiv Curator{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <!-- Back Button -->
+        <div class="mb-3">
+            <a href="/" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-1"></i>Back to Papers
+            </a>
+        </div>
+
+        <!-- Paper Header -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <h1 class="card-title h3">{{ paper.title }}</h1>
+                    {% if paper.summary and paper.summary.relevance_score %}
+                    <span class="relevance-score 
+                        {% if paper.summary.relevance_score >= 8 %}score-high
+                        {% elif paper.summary.relevance_score >= 6 %}score-medium
+                        {% else %}score-low{% endif %}">
+                        <i class="fas fa-star me-1"></i>{{ paper.summary.relevance_score }}/10
+                    </span>
+                    {% endif %}
+                </div>
+
+                <!-- Metadata -->
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <p class="mb-2">
+                            <strong><i class="fas fa-id-card me-1"></i>ArXiv ID:</strong> 
+                            <a href="https://arxiv.org/abs/{{ paper.arxiv_id }}" target="_blank" class="text-decoration-none">
+                                {{ paper.arxiv_id }}
+                            </a>
+                        </p>
+                        <p class="mb-2">
+                            <strong><i class="fas fa-calendar me-1"></i>Published:</strong> 
+                            {{ paper.published_date.strftime('%B %d, %Y') }}
+                        </p>
+                    </div>
+                    <div class="col-md-6">
+                        <p class="mb-2">
+                            <strong><i class="fas fa-users me-1"></i>Authors:</strong>
+                        </p>
+                        <ul class="list-unstyled ms-3">
+                            {% for author in paper.authors %}
+                            <li class="small">{{ author }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Categories -->
+                <div class="mb-3">
+                    <strong><i class="fas fa-tags me-1"></i>Categories:</strong>
+                    {% for category in paper.categories %}
+                    <span class="badge bg-secondary me-1">{{ category }}</span>
+                    {% endfor %}
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="d-flex gap-2">
+                    <a href="{{ paper.pdf_url }}" target="_blank" class="btn btn-primary">
+                        <i class="fas fa-file-pdf me-1"></i>View PDF
+                    </a>
+                    <a href="https://arxiv.org/abs/{{ paper.arxiv_id }}" target="_blank" class="btn btn-outline-primary">
+                        <i class="fas fa-external-link-alt me-1"></i>ArXiv Page
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Abstract -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-file-alt me-2"></i>Abstract
+                </h5>
+            </div>
+            <div class="card-body">
+                <p class="text-justify">{{ paper.abstract }}</p>
+            </div>
+        </div>
+
+        <!-- AI-Generated Summary -->
+        {% if paper.summary %}
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-robot me-2"></i>AI-Generated Summary
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-4">
+                    <h6 class="text-primary">Summary</h6>
+                    <p>{{ paper.summary.summary }}</p>
+                </div>
+
+                {% if paper.summary.key_points %}
+                <div class="mb-4">
+                    <h6 class="text-primary">Key Points</h6>
+                    <ul>
+                        {% for point in paper.summary.key_points %}
+                        <li>{{ point }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+
+                <div class="text-muted small">
+                    <i class="fas fa-info-circle me-1"></i>
+                    Generated using {{ paper.summary.model_used }} • 
+                    Relevance Score: {{ paper.summary.relevance_score }}/10
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

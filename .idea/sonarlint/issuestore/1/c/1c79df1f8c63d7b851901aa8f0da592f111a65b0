@@ -1,6 +1,6 @@
 
-Npython:S1481"*Remove the unused local variable "result".(å‡«äøÿÿÿÿ8½ŠŸêù2
-dpython:S3457$"EAdd replacement fields or use a normal string instead of an f-string.(œöêƒ8½ŠŸêù2
-ipython:S34579"EAdd replacement fields or use a normal string instead of an f-string.(ıÏ“©úÿÿÿÿ8½ŠŸêù2
-ipython:S3457S"EAdd replacement fields or use a normal string instead of an f-string.(†Œ¼¡ıÿÿÿÿ8½ŠŸêù2
-xsecrets:S6698"SMake sure this PostgreSQL database password gets changed and removed from the code.(Ñİ”–ÿÿÿÿÿ8ÇŠŸêù2
+Ipython:S1481"*Remove the unused local variable "result".(¼Ò»È8•–¿›ú2
+Špython:S3457$"EAdd replacement fields or use a normal string instead of an f-string.(œöêƒ8½ŠŸêù2J$9fce3931-85e2-4d6f-9d8c-5682c638d28d
+python:S34579"EAdd replacement fields or use a normal string instead of an f-string.(ıÏ“©úÿÿÿÿ8½ŠŸêù2J$45382aa7-a3c4-4b4e-ab9d-e0bc858b7183
+python:S3457S"EAdd replacement fields or use a normal string instead of an f-string.(†Œ¼¡ıÿÿÿÿ8½ŠŸêù2J$b73c6cbc-f61d-4f5a-805f-1bb80849116f
+xsecrets:S6698"SMake sure this PostgreSQL database password gets changed and removed from the code.(Ñİ”–ÿÿÿÿÿ8 –¿›ú2

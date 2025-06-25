@@ -39,6 +39,22 @@ services:
       - "host.docker.internal:host-gateway"
     command: python -m main
 
+  web:
+    build: ./web
+    container_name: arxiv_web
+    ports:
+      - "5000:5000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://curator:${POSTGRES_PASSWORD:-secretpassword}@postgres:5432/arxiv_curator
+      PYTHONUNBUFFERED: 1
+    volumes:
+      - ./web:/app
+    networks:
+      - curator-network
+
 networks:
   curator-network:
     driver: bridge
