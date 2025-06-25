@@ -1,4 +1,4 @@
-# Database volumes (PostgreSQL data)
+.idea
 volumes/
 
 # Python

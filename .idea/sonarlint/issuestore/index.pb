@@ -25,3 +25,9 @@ H
 pipeline/src/database.py,8/8/88768a085999e4d074853501f783aba77a9f5aec
 M
 pipeline/src/test_pipeline.py,1/c/1c79df1f8c63d7b851901aa8f0da592f111a65b0
+:
+
+web/app.py,c/f/cf87a59fce4cbc965f0255636ea5f94ec8571c53
+:
+
+.gitignore,a/5/a5cc2925ca8258af241be7e5b0381edf30266302
