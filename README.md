@@ -35,6 +35,11 @@ arxiv-curator/
    cp .env.example .env
    # Edit .env with your HuggingFace token
    ```
+   
+   Note: You'll need to:
+   - Get a HuggingFace token from https://huggingface.co/settings/tokens
+   - Set a secure PostgreSQL password
+   - The default model is `facebook/bart-large-cnn`
 
 2. **Start services**:
    ```bash
