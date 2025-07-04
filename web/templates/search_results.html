@@ -3,124 +3,116 @@
 {% block title %}Search Results - ArXiv Curator{% endblock %}
 
 {% block content %}
-<div class="row">
-    <div class="col-12">
-        <!-- Back to Home -->
-        <div class="mb-3">
-            <a href="/" class="btn btn-outline-secondary">
-                <i class="fas fa-arrow-left me-1"></i>Back to All Papers
-            </a>
-        </div>
-
-        <!-- Search Header -->
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2>
-                <i class="fas fa-search me-2 text-primary"></i>
-                Search Results
-            </h2>
-            <div class="text-muted">
-                {% if query %}
-                    Found {{ papers|length }} results for "{{ query }}"
-                {% else %}
-                    Enter a search term
-                {% endif %}
-            </div>
-        </div>
-
-        <!-- Search Bar -->
-        <div class="row mb-4">
-            <div class="col-md-8 mx-auto">
-                <form action="/search" method="GET" class="d-flex">
-                    <input class="form-control me-2" type="search" name="q" value="{{ query }}" placeholder="Search papers by title..." aria-label="Search">
-                    <button class="btn btn-outline-primary" type="submit">
-                        <i class="fas fa-search"></i>
-                    </button>
-                </form>
-            </div>
-        </div>
-
-        <!-- Results -->
-        {% if papers %}
-        <div class="row">
-            {% for paper in papers %}
-            <div class="col-lg-6 mb-4">
-                <div class="card paper-card h-100">
-                    <div class="card-body">
-                        <!-- Relevance Score Badge -->
-                        {% if paper.summary and paper.summary.relevance_score %}
-                        <div class="d-flex justify-content-between align-items-start mb-2">
-                            <span class="relevance-score 
-                                {% if paper.summary.relevance_score >= 8 %}score-high
-                                {% elif paper.summary.relevance_score >= 6 %}score-medium
-                                {% else %}score-low{% endif %}">
-                                <i class="fas fa-star me-1"></i>{{ paper.summary.relevance_score }}/10
-                            </span>
-                            <small class="text-muted">{{ paper.published_date.strftime('%b %d, %Y') }}</small>
-                        </div>
-                        {% endif %}
-
-                        <!-- Title -->
-                        <h5 class="card-title">
-                            <a href="/paper/{{ paper.arxiv_id }}" class="text-decoration-none">
-                                {{ paper.title }}
-                            </a>
-                        </h5>
-
-                        <!-- Authors -->
-                        <p class="text-muted small mb-2">
-                            <i class="fas fa-users me-1"></i>
-                            {% for author in paper.authors[:3] %}
-                                {{ author }}{% if not loop.last %}, {% endif %}
-                            {% endfor %}
-                            {% if paper.authors|length > 3 %}
-                                <span class="text-muted">+{{ paper.authors|length - 3 }} more</span>
-                            {% endif %}
-                        </p>
-
-                        <!-- Categories -->
-                        <div class="mb-2">
-                            {% for category in paper.categories[:3] %}
-                            <span class="badge bg-secondary me-1">{{ category }}</span>
-                            {% endfor %}
-                        </div>
-
-                        <!-- AI Summary -->
-                        {% if paper.summary %}
-                        <div class="mt-3">
-                            <h6 class="text-primary">
-                                <i class="fas fa-robot me-1"></i>AI Summary
-                            </h6>
-                            <p class="card-text">{{ paper.summary.summary }}</p>
-                        </div>
-                        {% endif %}
-
-                        <!-- Action Buttons -->
-                        <div class="d-flex justify-content-between align-items-center mt-3">
-                            <a href="/paper/{{ paper.arxiv_id }}" class="btn btn-sm btn-outline-primary">
-                                <i class="fas fa-info-circle me-1"></i>Details
-                            </a>
-                            <a href="{{ paper.pdf_url }}" target="_blank" class="btn btn-sm btn-primary">
-                                <i class="fas fa-file-pdf me-1"></i>PDF
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            {% endfor %}
-        </div>
-        {% elif query %}
-        <div class="text-center py-5">
-            <i class="fas fa-search-minus fa-3x text-muted mb-3"></i>
-            <h4 class="text-muted">No papers found</h4>
-            <p class="text-muted">Try a different search term or browse all papers.</p>
-        </div>
-        {% else %}
-        <div class="text-center py-5">
-            <i class="fas fa-search fa-3x text-muted mb-3"></i>
-            <h4 class="text-muted">Enter a search term</h4>
-            <p class="text-muted">Search for papers by title or keywords.</p>
-        </div>
+<div class="container" style="padding-top: 2rem;">
+    <!-- Search Header -->
+    <div style="text-align: center; margin-bottom: 3rem;">
+        <h1>Search Results</h1>
+        {% if query %}
+        <p style="font-size: 1.25rem; color: var(--gray-600); margin-top: 0.5rem;">
+            Found {{ papers|length }} paper{% if papers|length != 1 %}s{% endif %} matching "<strong>{{ query }}</strong>"
+        </p>
         {% endif %}
     </div>
+
+    <!-- Search Box -->
+    <div class="search-section" style="margin-bottom: 3rem;">
+        <form action="/search" method="GET" class="search-form">
+            <input type="text" name="q" class="search-input" value="{{ query }}" placeholder="Search papers..." autocomplete="off">
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-search"></i> Search
+            </button>
+        </form>
+    </div>
+
+    <!-- Results -->
+    {% if papers %}
+    <div class="papers-grid">
+        {% for paper in papers %}
+        <div class="paper-card fade-in">
+            <!-- Paper Header -->
+            <div class="paper-card-header">
+                <span class="paper-id">
+                    <i class="fas fa-fingerprint"></i> {{ paper.arxiv_id }}
+                </span>
+                <span class="paper-date">
+                    {{ paper.published_date.strftime('%Y-%m-%d') }}
+                </span>
+            </div>
+            
+            <div class="paper-card-body">
+                <!-- Title -->
+                <h3 class="paper-title">
+                    <a href="/paper/{{ paper.arxiv_id }}">{{ paper.title }}</a>
+                </h3>
+                
+                <!-- Authors -->
+                <div class="paper-authors">
+                    <i class="fas fa-users author-icon"></i>
+                    {% for author in paper.authors[:3] %}
+                        {{ author }}{% if not loop.last %}, {% endif %}
+                    {% endfor %}
+                    {% if paper.authors|length > 3 %}
+                        <span style="color: var(--gray-500);">+{{ paper.authors|length - 3 }} more</span>
+                    {% endif %}
+                </div>
+                
+                <!-- Categories -->
+                <div class="tags">
+                    {% for category in paper.categories[:3] %}
+                    <span class="tag">{{ category }}</span>
+                    {% endfor %}
+                </div>
+                
+                <!-- Actions -->
+                <div class="paper-actions">
+                    <a href="/paper/{{ paper.arxiv_id }}" class="btn btn-secondary btn-sm">
+                        <i class="fas fa-info-circle"></i> Details
+                    </a>
+                    <a href="{{ paper.pdf_url }}" target="_blank" class="btn btn-primary btn-sm">
+                        <i class="fas fa-file-pdf"></i> PDF
+                    </a>
+                    {% if paper.has_summary and paper.relevance_score %}
+                    <div class="relevance-badge-inline {% if paper.relevance_score >= 8 %}relevance-high{% elif paper.relevance_score >= 6 %}relevance-medium{% else %}relevance-low{% endif %}">
+                        <i class="fas fa-star"></i> {{ paper.relevance_score }}/10
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <!-- No Results -->
+    <div class="empty-state">
+        <div class="empty-icon">
+            <i class="fas fa-search"></i>
+        </div>
+        <h3>No Papers Found</h3>
+        <p>Try adjusting your search terms or browse all papers</p>
+        <div style="margin-top: 2rem;">
+            <a href="/" class="btn btn-primary">
+                <i class="fas fa-home"></i> Browse All Papers
+            </a>
+        </div>
+    </div>
+    {% endif %}
 </div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+// Add fade-in animation
+document.addEventListener('DOMContentLoaded', () => {
+    const papers = document.querySelectorAll('.paper-card');
+    papers.forEach((paper, index) => {
+        paper.style.opacity = '0';
+        paper.style.transform = 'translateY(20px)';
+        setTimeout(() => {
+            paper.style.transition = 'all 0.5s ease-out';
+            paper.style.opacity = '1';
+            paper.style.transform = 'translateY(0)';
+        }, index * 100);
+    });
+});
+</script>
 {% endblock %}

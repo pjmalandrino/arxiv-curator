@@ -1,0 +1,165 @@
+{% extends "base.html" %}
+
+{% block title %}About - ArXiv Curator{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero" style="background: var(--gradient-primary); color: white; padding: 4rem 0;">
+    <div class="container" style="text-align: center;">
+        <h1 style="color: white; margin-bottom: 1rem;">About ArXiv Curator</h1>
+        <p style="font-size: 1.25rem; opacity: 0.9; max-width: 700px; margin: 0 auto;">
+            An intelligent system that automatically discovers, analyzes, and summarizes 
+            the latest AI research papers to keep you at the forefront of innovation
+        </p>
+    </div>
+</section>
+
+<div class="container" style="padding: 3rem 0;">
+    <div style="max-width: 900px; margin: 0 auto;">
+        
+        <!-- Mission Card -->
+        <div class="paper-card" style="margin-bottom: 2rem;">
+            <div class="paper-card-body">
+                <h2 style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1.5rem;">
+                    <i class="fas fa-bullseye" style="color: var(--primary);"></i> Our Mission
+                </h2>
+                <p style="font-size: 1.125rem; line-height: 1.8; color: var(--gray-700);">
+                    The field of AI research moves at breakneck speed, with hundreds of papers published daily. 
+                    ArXiv Curator helps researchers, engineers, and enthusiasts stay informed by automatically 
+                    processing and summarizing the most relevant papers in machine learning, natural language 
+                    processing, and artificial intelligence.
+                </p>
+            </div>
+        </div>
+
+        <!-- Features Grid -->
+        <h2 style="text-align: center; margin-bottom: 2rem;">Key Features</h2>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin-bottom: 3rem;">
+            
+            <div class="paper-card">
+                <div class="paper-card-body" style="text-align: center;">
+                    <div style="font-size: 3rem; margin-bottom: 1rem;">🔍</div>
+                    <h3 style="font-size: 1.125rem; margin-bottom: 0.75rem;">Smart Discovery</h3>
+                    <p style="color: var(--gray-600);">
+                        Automatically fetches the latest papers from ArXiv based on 
+                        configurable categories and keywords
+                    </p>
+                </div>
+            </div>
+            
+            <div class="paper-card">
+                <div class="paper-card-body" style="text-align: center;">
+                    <div style="font-size: 3rem; margin-bottom: 1rem;">🤖</div>
+                    <h3 style="font-size: 1.125rem; margin-bottom: 0.75rem;">AI Summaries</h3>
+                    <p style="color: var(--gray-600);">
+                        Uses state-of-the-art language models to generate concise 
+                        summaries and extract key insights
+                    </p>
+                </div>
+            </div>
+            
+            <div class="paper-card">
+                <div class="paper-card-body" style="text-align: center;">
+                    <div style="font-size: 3rem; margin-bottom: 1rem;">⭐</div>
+                    <h3 style="font-size: 1.125rem; margin-bottom: 0.75rem;">Relevance Scoring</h3>
+                    <p style="color: var(--gray-600);">
+                        Rates each paper's relevance to LLM research, helping you 
+                        prioritize your reading list
+                    </p>
+                </div>
+            </div>
+            
+            <div class="paper-card">
+                <div class="paper-card-body" style="text-align: center;">
+                    <div style="font-size: 3rem; margin-bottom: 1rem;">📊</div>
+                    <h3 style="font-size: 1.125rem; margin-bottom: 0.75rem;">Clean Interface</h3>
+                    <p style="color: var(--gray-600);">
+                        Modern, responsive design that makes browsing and searching 
+                        papers a delightful experience
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tech Stack -->
+        <div class="paper-card" style="background: linear-gradient(135deg, #667eea08 0%, #764ba208 100%); border: 2px solid var(--primary-light); margin-bottom: 2rem;">
+            <div class="paper-card-body">
+                <h2 style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1.5rem; color: var(--primary);">
+                    <i class="fas fa-layer-group"></i> Technology Stack
+                </h2>
+                
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2rem;">
+                    <div>
+                        <h4 style="color: var(--primary); margin-bottom: 0.75rem;">Backend</h4>
+                        <ul style="list-style: none; padding: 0;">
+                            <li style="padding: 0.25rem 0;"><i class="fas fa-check" style="color: var(--success); margin-right: 0.5rem;"></i> Python 3.11</li>
+                            <li style="padding: 0.25rem 0;"><i class="fas fa-check" style="color: var(--success); margin-right: 0.5rem;"></i> Flask Web Framework</li>
+                            <li style="padding: 0.25rem 0;"><i class="fas fa-check" style="color: var(--success); margin-right: 0.5rem;"></i> PostgreSQL Database</li>
+                            <li style="padding: 0.25rem 0;"><i class="fas fa-check" style="color: var(--success); margin-right: 0.5rem;"></i> SQLAlchemy ORM</li>
+                        </ul>
+                    </div>
+                    
+                    <div>
+                        <h4 style="color: var(--primary); margin-bottom: 0.75rem;">AI/ML Pipeline</h4>
+                        <ul style="list-style: none; padding: 0;">
+                            <li style="padding: 0.25rem 0;"><i class="fas fa-check" style="color: var(--success); margin-right: 0.5rem;"></i> Ollama LLM Server</li>
+                            <li style="padding: 0.25rem 0;"><i class="fas fa-check" style="color: var(--success); margin-right: 0.5rem;"></i> Gemma 2 Model</li>
+                            <li style="padding: 0.25rem 0;"><i class="fas fa-check" style="color: var(--success); margin-right: 0.5rem;"></i> ArXiv API Client</li>
+                            <li style="padding: 0.25rem 0;"><i class="fas fa-check" style="color: var(--success); margin-right: 0.5rem;"></i> Batch Processing</li>
+                        </ul>
+                    </div>
+                    
+                    <div>
+                        <h4 style="color: var(--primary); margin-bottom: 0.75rem;">Infrastructure</h4>
+                        <ul style="list-style: none; padding: 0;">
+                            <li style="padding: 0.25rem 0;"><i class="fas fa-check" style="color: var(--success); margin-right: 0.5rem;"></i> Docker Containers</li>
+                            <li style="padding: 0.25rem 0;"><i class="fas fa-check" style="color: var(--success); margin-right: 0.5rem;"></i> Docker Compose</li>
+                            <li style="padding: 0.25rem 0;"><i class="fas fa-check" style="color: var(--success); margin-right: 0.5rem;"></i> Volume Persistence</li>
+                            <li style="padding: 0.25rem 0;"><i class="fas fa-check" style="color: var(--success); margin-right: 0.5rem;"></i> Health Checks</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- How It Works -->
+        <div class="paper-card" style="margin-bottom: 2rem;">
+            <div class="paper-card-body">
+                <h2 style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1.5rem;">
+                    <i class="fas fa-cogs" style="color: var(--primary);"></i> How It Works
+                </h2>
+                
+                <ol style="padding-left: 1.5rem;">
+                    <li style="padding: 0.5rem 0; line-height: 1.8;">
+                        <strong>Discovery:</strong> The pipeline queries ArXiv for recent papers in AI/ML categories
+                    </li>
+                    <li style="padding: 0.5rem 0; line-height: 1.8;">
+                        <strong>Filtering:</strong> Papers are filtered based on configured keywords and relevance
+                    </li>
+                    <li style="padding: 0.5rem 0; line-height: 1.8;">
+                        <strong>Analysis:</strong> Each paper is processed by the LLM to extract insights
+                    </li>
+                    <li style="padding: 0.5rem 0; line-height: 1.8;">
+                        <strong>Storage:</strong> Papers and summaries are stored in PostgreSQL
+                    </li>
+                    <li style="padding: 0.5rem 0; line-height: 1.8;">
+                        <strong>Presentation:</strong> Results are displayed in this beautiful web interface
+                    </li>
+                </ol>
+            </div>
+        </div>
+
+        <!-- CTA -->
+        <div style="text-align: center; padding: 3rem 0;">
+            <h3 style="margin-bottom: 1rem;">Ready to Get Started?</h3>
+            <p style="color: var(--gray-600); margin-bottom: 2rem;">
+                Check out the project on GitHub for installation instructions and documentation
+            </p>
+            <a href="https://github.com" target="_blank" class="btn btn-primary">
+                <i class="fab fa-github"></i> View on GitHub
+            </a>
+        </div>
+        
+    </div>
+</div>
+{% endblock %}

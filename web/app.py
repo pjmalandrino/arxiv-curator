@@ -1,10 +1,10 @@
-from flask import Flask, render_template, jsonify
+from flask import Flask, render_template, jsonify, request, redirect, url_for
 from sqlalchemy import create_engine, text
 from datetime import datetime, date
 import os
 import json
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='static')
 
 # Configuration
 DATABASE_URL = os.getenv('DATABASE_URL', 'postgresql://curator:secretpassword@localhost:5432/arxiv_curator')
@@ -160,6 +160,62 @@ def paper_detail(arxiv_id):
         }
 
         return render_template('paper_detail.html', paper=paper)
+
+@app.route('/search')
+def search():
+    """Search papers by title"""
+    query = request.args.get('q', '')
+    
+    if not query:
+        return redirect(url_for('index'))
+    
+    search_query = """
+    SELECT 
+        p.id,
+        p.arxiv_id,
+        p.title,
+        p.authors,
+        p.abstract,
+        p.published_date,
+        p.categories,
+        p.pdf_url,
+        s.summary,
+        s.key_points,
+        s.relevance_score,
+        s.model_used
+    FROM papers p
+    LEFT JOIN summaries s ON p.id = s.paper_id
+    WHERE LOWER(p.title) LIKE LOWER(:query)
+    ORDER BY p.published_date DESC
+    """
+    
+    with engine.connect() as conn:
+        result = conn.execute(text(search_query), {'query': f'%{query}%'})
+        papers = []
+        for row in result:
+            paper_dict = {
+                'id': str(row.id),
+                'arxiv_id': row.arxiv_id,
+                'title': row.title,
+                'authors': row.authors,
+                'abstract': row.abstract[:300] + '...' if len(row.abstract) > 300 else row.abstract,
+                'published_date': row.published_date,
+                'categories': row.categories,
+                'pdf_url': row.pdf_url,
+                'summary': row.summary,
+                'key_points': row.key_points if row.key_points else [],
+                'relevance_score': row.relevance_score,
+                'model_used': row.model_used,
+                'has_summary': row.summary is not None
+            }
+            papers.append(paper_dict)
+    
+    return render_template('search_results.html', papers=papers, query=query)
+
+@app.route('/about')
+def about():
+    """About page"""
+    return render_template('about.html')
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
