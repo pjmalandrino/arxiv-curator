@@ -4,7 +4,9 @@ from datetime import datetime, date
 import os
 import json
 
-app = Flask(__name__, static_folder='static')
+app = Flask(__name__, 
+            static_folder='../static',
+            template_folder='../templates')
 
 # Configuration
 DATABASE_URL = os.getenv('DATABASE_URL', 'postgresql://curator:secretpassword@localhost:5432/arxiv_curator')
