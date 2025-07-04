@@ -5,7 +5,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-class ArxivClient:
+class ArxivService:
     def __init__(self, categories: List[str], keywords: List[str]):
         self.categories = categories
         self.keywords = keywords

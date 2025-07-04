@@ -5,7 +5,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-class OllamaClient:
+class OllamaService:
     def __init__(self, host: str, model: str):
         self.host = host
         self.model = model

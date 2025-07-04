@@ -1,0 +1,22 @@
+.PHONY: help build up down logs test clean pipeline
+
+help:
+	@echo "Commands: build, up, down, logs, pipeline, test, clean"
+
+build:
+	docker-compose build
+
+up:
+	docker-compose up -d
+
+down:
+	docker-compose down
+
+logs:
+	docker-compose logs -f
+
+pipeline:
+	docker-compose run --rm pipeline python scripts/run_pipeline.py
+
+clean:
+	docker-compose down -v
