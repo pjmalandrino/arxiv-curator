@@ -44,6 +44,8 @@ services:
         condition: service_healthy
     environment:
       DATABASE_URL: postgresql://curator:${POSTGRES_PASSWORD:-secretpassword}@postgres:5432/arxiv_curator
+      HF_TOKEN: ${HF_TOKEN}
+      HF_MODEL: ${HF_MODEL:-facebook/bart-large-cnn}
       PYTHONUNBUFFERED: 1
     volumes:
       - ./src:/app/src

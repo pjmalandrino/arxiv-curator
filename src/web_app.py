@@ -3,10 +3,27 @@ from sqlalchemy import create_engine, text
 from datetime import datetime, date
 import os
 import json
+import logging
+
+# Configure logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
+
+# Import admin blueprint
+from src.admin.routes import admin_bp
 
 app = Flask(__name__, 
             static_folder='../static',
             template_folder='../templates')
+
+# Set secret key for sessions
+app.config['SECRET_KEY'] = os.urandom(24)
+
+# Configure app logging
+app.logger.setLevel(logging.INFO)
+
+# Register admin blueprint
+app.register_blueprint(admin_bp)
 
 # Configuration
 DATABASE_URL = os.getenv('DATABASE_URL', 'postgresql://curator:secretpassword@localhost:5432/arxiv_curator')
