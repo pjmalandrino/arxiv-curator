@@ -18,3 +18,8 @@ class Config:
     # Processing settings
     batch_size: int = 5
     log_level: str = 'INFO'
+    
+    # Scoring settings
+    min_relevance_score: float = 0.4  # Minimum score to process a paper
+    ollama_host: str = os.getenv('OLLAMA_HOST', 'http://localhost:11434')
+    ollama_model: str = os.getenv('OLLAMA_MODEL', 'gemma3:4b')
