@@ -1,16 +1,33 @@
 # Core dependencies
-arxiv==2.1.0
+python-dotenv==1.0.0
+pydantic==2.5.0
+
+# Web framework
+flask==3.0.0
+flask-cors==4.0.0
+
+# Database
 sqlalchemy==2.0.23
 psycopg2-binary==2.9.9
+
+# ArXiv API
+arxiv==2.0.0
+
+# HTTP client
 requests==2.31.0
-python-dotenv==1.0.0
-huggingface-hub==0.20.1
-aiohttp==3.9.1
+urllib3==2.1.0
 
-# Web dependencies
-flask==3.0.0
-flask-sqlalchemy==3.1.1
+# AI/ML APIs
+huggingface-hub==0.19.4
+transformers==4.36.0
 
-# Dev dependencies
+# Utilities
+python-dateutil==2.8.2
+click==8.1.7
+
+# Development
 pytest==7.4.3
-pytest-asyncio==0.21.1
+pytest-cov==4.1.0
+black==23.11.0
+flake8==6.1.0
+mypy==1.7.1

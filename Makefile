@@ -1,76 +1,70 @@
-# ArXiv Curator Testing Makefile
+.PHONY: help build up down logs shell test format lint clean
 
-.PHONY: test test-unit test-integration test-e2e test-performance test-all
-.PHONY: test-docker test-coverage clean-test install-test-deps
+# Default target
+help:
+	@echo "ArXiv Curator - Development Commands"
+	@echo ""
+	@echo "Usage: make [target]"
+	@echo ""
+	@echo "Targets:"
+	@echo "  build       Build Docker images"
+	@echo "  up          Start all services"
+	@echo "  down        Stop all services"
+	@echo "  logs        View logs"
+	@echo "  shell       Open shell in pipeline container"
+	@echo "  test        Run tests"
+	@echo "  format      Format code with black"
+	@echo "  lint        Run linting checks"
+	@echo "  clean       Clean up containers and volumes"
+	@echo "  run         Run the pipeline once"
+	@echo "  web         Access web interface"
 
-# Install test dependencies
-install-test-deps:
-	pip install -r requirements-test.txt
+# Build Docker images
+build:
+	docker-compose build
 
-# Run all tests
-test: test-unit test-integration
+# Start services
+up:
+	docker-compose up -d
+	@echo "Services started. Web interface at http://localhost:5000"
 
-# Run unit tests only
-test-unit:
-	pytest tests/unit -v -m "not slow"
+# Stop services
+down:
+	docker-compose down
 
-# Run integration tests
-test-integration:
-	pytest tests/integration -v
+# View logs
+logs:
+	docker-compose logs -f
 
-# Run end-to-end tests
-test-e2e:
-	pytest tests/e2e -v -m "e2e"
+# Open shell
+shell:
+	docker-compose run --rm pipeline bash
 
-# Run performance tests
-test-performance:
-	pytest tests/performance -v -m "performance"
+# Run tests
+test:
+	docker-compose -f docker-compose.test.yml run --rm tests
 
-# Run all tests with coverage
-test-all:
-	pytest tests/ -v --cov=src --cov-report=html --cov-report=term
+# Format code
+format:
+	@echo "Formatting code with black..."
+	@docker run --rm -v $$(pwd):/app -w /app python:3.11-slim sh -c "pip install black && black src/"
 
-# Run tests in Docker
-test-docker:
-	docker-compose -f docker-compose.test.yml up --build --abort-on-container-exit
-	docker-compose -f docker-compose.test.yml down
+# Lint code
+lint:
+	@echo "Running linting checks..."
+	@docker run --rm -v $$(pwd):/app -w /app python:3.11-slim sh -c "pip install flake8 mypy && flake8 src/ && mypy src/"
 
-# Run specific test file
-test-file:
-	@read -p "Enter test file path: " filepath; \
-	pytest $$filepath -v
-
-# Run tests with coverage report
-test-coverage:
-	pytest tests/ --cov=src --cov-report=html
-	@echo "Coverage report generated in htmlcov/index.html"
-	@python -m webbrowser htmlcov/index.html
-
-# Clean test artifacts
-clean-test:
-	rm -rf .pytest_cache
-	rm -rf htmlcov
-	rm -rf .coverage
-	rm -f coverage.xml
+# Clean up
+clean:
+	docker-compose down -v
 	find . -type d -name "__pycache__" -exec rm -rf {} +
 	find . -type f -name "*.pyc" -delete
 
-# Run tests in watch mode (requires pytest-watch)
-test-watch:
-	ptw tests/ --runner "pytest -v"
+# Run pipeline once
+run:
+	docker-compose run --rm pipeline python -m src.main
 
-# Run tests with different markers
-test-fast:
-	pytest -v -m "not slow and not docker"
-
-test-slow:
-	pytest -v -m "slow"
-
-# Lint tests
-lint-tests:
-	flake8 tests/ --max-line-length=100
-	pylint tests/
-
-# Type check tests
-type-check-tests:
-	mypy tests/ --ignore-missing-imports
+# Open web interface
+web:
+	@echo "Opening web interface..."
+	@open http://localhost:5000 || xdg-open http://localhost:5000 || echo "Please open http://localhost:5000 in your browser"

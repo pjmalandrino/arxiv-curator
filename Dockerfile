@@ -1,27 +1,28 @@
 FROM python:3.11-slim
 
+# Set working directory
 WORKDIR /app
 
-# Install build dependencies for psutil
+# Install system dependencies
 RUN apt-get update && apt-get install -y \
     gcc \
-    python3-dev \
+    g++ \
     && rm -rf /var/lib/apt/lists/*
 
-# Install dependencies
+# Copy requirements first for better caching
 COPY requirements.txt .
-COPY requirements-test.txt .
 RUN pip install --no-cache-dir -r requirements.txt
-RUN pip install --no-cache-dir -r requirements-test.txt
 
 # Copy application code
-COPY src/ /app/src/
-COPY templates/ /app/templates/
-COPY static/ /app/static/
-COPY tests/ /app/tests/
+COPY src/ ./src/
+COPY templates/ ./templates/
+COPY static/ ./static/
 
 # Create necessary directories
-RUN mkdir -p /logs
+RUN mkdir -p /logs /app/volumes
 
-# Default command (can be overridden)
+# Set Python path
+ENV PYTHONPATH=/app
+
+# Default command (can be overridden in docker-compose)
 CMD ["python", "-m", "src.main"]

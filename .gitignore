@@ -7,23 +7,52 @@ __pycache__/
 venv/
 env/
 ENV/
+.venv
+
+# Testing
+.coverage
+.pytest_cache/
+htmlcov/
+coverage/
+*.cover
+.hypothesis/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
 
 # Environment
 .env
+.env.local
+.env.*.local
 
-# IDE
-.vscode/
-.idea/
-*.swp
-*.swo
+# Logs
+*.log
+logs/
+/logs/
 
-# Docker volumes
+# Database
+*.db
+*.sqlite
+*.sqlite3
 volumes/
 
 # OS
 .DS_Store
 Thumbs.db
 
-# Logs
-*.log
-logs/
+# Docker
+.docker/
+
+# Build
+build/
+dist/
+*.egg-info/
+
+# Temporary files
+*.tmp
+*.bak
+.cache/

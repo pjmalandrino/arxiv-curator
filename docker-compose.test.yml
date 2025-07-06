@@ -1,41 +1,29 @@
 version: '3.8'
 
 services:
-  test-postgres:
+  postgres-test:
     image: postgres:15-alpine
-    container_name: arxiv_test_postgres
     environment:
       POSTGRES_DB: arxiv_curator_test
       POSTGRES_USER: curator
       POSTGRES_PASSWORD: testpassword
     ports:
       - "5433:5432"
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U curator -d arxiv_curator_test"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
 
-  test-runner:
+  tests:
     build: .
-    container_name: arxiv_test_runner
     depends_on:
-      test-postgres:
-        condition: service_healthy
+      - postgres-test
     environment:
-      DATABASE_URL: postgresql://curator:testpassword@test-postgres:5432/arxiv_curator_test
+      DATABASE_URL: postgresql://curator:testpassword@postgres-test:5432/arxiv_curator_test
       HF_TOKEN: ${HF_TOKEN}
-      HF_MODEL: ${HF_MODEL:-facebook/bart-large-cnn}
       PYTHONUNBUFFERED: 1
-      TESTING: 1
     volumes:
       - ./src:/app/src
       - ./tests:/app/tests
-      - ./pytest.ini:/app/pytest.ini
-      - ./.coveragerc:/app/.coveragerc
-      - ./htmlcov:/app/htmlcov
-    command: pytest -v --cov=src --cov-report=html
+      - ./coverage:/app/coverage
+    command: pytest -v --cov=src --cov-report=html:/app/coverage
 
 networks:
   default:
-    name: arxiv-test-network
+    name: arxiv-curator-test-network
