@@ -60,3 +60,33 @@ class DatabaseManager:
             return exists
         finally:
             session.close()
+    
+    def get_paper_by_arxiv_id(self, arxiv_id: str) -> Optional[Paper]:
+        """Retrieve paper by arxiv_id"""
+        session = self.get_session()
+        try:
+            return session.query(Paper).filter_by(arxiv_id=arxiv_id).first()
+        finally:
+            session.close()
+    
+    def get_recent_papers(self, days: int = 30):
+        """Get papers from the last N days"""
+        from datetime import datetime, timedelta
+        session = self.get_session()
+        try:
+            cutoff_date = datetime.now().date() - timedelta(days=days)
+            return session.query(Paper).filter(
+                Paper.published_date >= cutoff_date
+            ).order_by(Paper.published_date.desc()).all()
+        finally:
+            session.close()
+    
+    def get_papers_by_category(self, category: str):
+        """Get papers by category"""
+        session = self.get_session()
+        try:
+            return session.query(Paper).filter(
+                Paper.categories.contains([category])
+            ).all()
+        finally:
+            session.close()
