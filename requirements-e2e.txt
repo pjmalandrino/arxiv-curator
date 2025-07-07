@@ -1,0 +1,22 @@
+# Core testing frameworks
+playwright==1.40.0
+pytest==7.4.3
+pytest-asyncio==0.21.1
+pytest-xdist==3.5.0
+pytest-html==4.1.1
+pytest-timeout==2.2.0
+
+# Reporting and screenshots
+allure-pytest==2.13.2
+pytest-metadata==3.0.0
+
+# API testing
+requests==2.31.0
+httpx==0.25.2
+
+# Database - using asyncpg instead of psycopg2
+asyncpg==0.29.0
+
+# Utilities
+python-dotenv==1.0.0
+tenacity==8.2.3

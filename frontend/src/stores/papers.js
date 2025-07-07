@@ -67,9 +67,22 @@ export const usePapersStore = defineStore('papers', {
     async fetchStats() {
       try {
         const response = await api.stats()
-        this.stats = response.data
+        const data = response.data
+        this.stats = {
+          totalPapers: data.total_papers || 0,
+          recentPapers: data.recent_papers || 0,
+          averageScore: data.average_score || 0,
+          lastUpdate: data.last_update
+        }
       } catch (error) {
         console.error('Error fetching stats:', error)
+        // Set default values on error
+        this.stats = {
+          totalPapers: 0,
+          recentPapers: 0,
+          averageScore: 0,
+          lastUpdate: new Date().toISOString()
+        }
       }
     },
 

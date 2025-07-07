@@ -1,0 +1,67 @@
+name: E2E Tests
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    - cron: '0 0 * * *'  # Daily at midnight
+
+jobs:
+  e2e-tests:
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        browser: [chromium, firefox, webkit]
+        
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+        
+    - name: Install dependencies
+      run: |
+        pip install -r requirements-e2e.txt
+        playwright install --with-deps ${{ matrix.browser }}
+        
+    - name: Start services
+      run: |
+        docker-compose -f docker-compose.test.yml up -d
+        ./scripts/wait-for-services.sh
+        
+    - name: Run E2E tests
+      env:
+        E2E_BROWSER: ${{ matrix.browser }}
+        E2E_HEADLESS: true
+      run: |
+        pytest tests/e2e/scenarios \
+          -v \
+          --html=reports/e2e-report-${{ matrix.browser }}.html \
+          --self-contained-html \
+          --junit-xml=reports/junit-${{ matrix.browser }}.xml
+          
+    - name: Upload test results
+      if: always()
+      uses: actions/upload-artifact@v3
+      with:
+        name: e2e-results-${{ matrix.browser }}
+        path: |
+          reports/
+          screenshots/
+          
+    - name: Publish test results
+      uses: dorny/test-reporter@v1
+      if: always()
+      with:
+        name: E2E Tests - ${{ matrix.browser }}
+        path: reports/junit-${{ matrix.browser }}.xml
+        reporter: java-junit
+        
+    - name: Stop services
+      if: always()
+      run: docker-compose -f docker-compose.test.yml down -v

@@ -24,3 +24,8 @@ class SummarizationError(ArxivCuratorError):
 class ConfigurationError(ArxivCuratorError):
     """Raised when configuration is invalid."""
     pass
+
+
+class AuthenticationError(ArxivCuratorError):
+    """Raised when authentication fails."""
+    pass

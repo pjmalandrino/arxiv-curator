@@ -33,6 +33,11 @@
               </router-link>
             </div>
           </div>
+          
+          <!-- Auth Button -->
+          <div class="flex items-center">
+            <AuthButton />
+          </div>
         </div>
       </div>
     </nav>
@@ -49,8 +54,13 @@
 </template>
 
 <script>
+import AuthButton from '@/components/AuthButton.vue'
+
 export default {
-  name: 'App'
+  name: 'App',
+  components: {
+    AuthButton
+  }
 }
 </script>
 

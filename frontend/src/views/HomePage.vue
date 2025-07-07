@@ -28,7 +28,7 @@
       />
       <StatsCard
         title="Average Score"
-        :value="stats.averageScore.toFixed(2)"
+        :value="stats.averageScore ? stats.averageScore.toFixed(2) : '0.00'"
         icon="chart-bar"
         color="purple"
       />

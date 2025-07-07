@@ -55,6 +55,16 @@ class ProcessingConfig:
 
 
 @dataclass
+class KeycloakConfig:
+    """Keycloak configuration settings."""
+    url: str
+    realm: str
+    client_id: str
+    client_secret: str
+    frontend_client_id: str
+
+
+@dataclass
 class Config:
     """Main application configuration."""
     database: DatabaseConfig
@@ -62,6 +72,9 @@ class Config:
     huggingface: HuggingFaceConfig
     ollama: OllamaConfig
     processing: ProcessingConfig
+    keycloak: KeycloakConfig
+    jwt_algorithm: str = "RS256"
+    secret_key: str = "default-secret-key"
     log_level: str = "INFO"
     log_dir: Optional[Path] = None
 
@@ -122,6 +135,15 @@ class Config:
             retry_delay=float(os.getenv("RETRY_DELAY", "5.0"))
         )
 
+        # Keycloak configuration
+        keycloak = KeycloakConfig(
+            url=os.getenv("KEYCLOAK_URL", "http://localhost:8080"),
+            realm=os.getenv("KEYCLOAK_REALM", "arxiv-curator"),
+            client_id=os.getenv("KEYCLOAK_CLIENT_ID", "arxiv-backend"),
+            client_secret=os.getenv("KEYCLOAK_CLIENT_SECRET", ""),
+            frontend_client_id=os.getenv("KEYCLOAK_FRONTEND_CLIENT_ID", "arxiv-frontend")
+        )
+
         log_dir = os.getenv("LOG_DIR")
         
         return cls(
@@ -130,6 +152,9 @@ class Config:
             huggingface=huggingface,
             ollama=ollama,
             processing=processing,
+            keycloak=keycloak,
+            jwt_algorithm=os.getenv("JWT_ALGORITHM", "RS256"),
+            secret_key=os.getenv("SECRET_KEY", "default-secret-key"),
             log_level=os.getenv("LOG_LEVEL", "INFO"),
             log_dir=Path(log_dir) if log_dir else None
         )

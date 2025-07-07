@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { keycloak } from './keycloak'
 
 const API_BASE_URL = '/api'
 
@@ -10,13 +11,12 @@ const apiClient = axios.create({
   }
 })
 
-// Request interceptor for auth token (future use)
+// Request interceptor for auth token
 apiClient.interceptors.request.use(
   config => {
-    // Add auth token if available
-    const token = localStorage.getItem('auth_token')
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`
+    // Add auth token from Keycloak if available
+    if (keycloak.authenticated && keycloak.token) {
+      config.headers.Authorization = `Bearer ${keycloak.token}`
     }
     return config
   },
@@ -28,17 +28,38 @@ apiClient.interceptors.request.use(
 // Response interceptor for error handling
 apiClient.interceptors.response.use(
   response => response,
-  error => {
+  async error => {
     if (error.response?.status === 401) {
-      // Handle unauthorized access
-      localStorage.removeItem('auth_token')
-      window.location.href = '/login'
+      // Try to refresh token
+      try {
+        const refreshed = await keycloak.updateToken(5)
+        if (refreshed) {
+          // Retry the original request
+          const originalRequest = error.config
+          originalRequest.headers.Authorization = `Bearer ${keycloak.token}`
+          return apiClient(originalRequest)
+        }
+      } catch (refreshError) {
+        // If refresh fails, redirect to login
+        console.error('Token refresh failed:', refreshError)
+        await keycloak.login()
+      }
     }
     return Promise.reject(error)
   }
 )
 
 export default {
+  // Expose the axios instance for direct use
+  apiClient,
+  
+  // Convenience methods
+  get: apiClient.get,
+  post: apiClient.post,
+  put: apiClient.put,
+  delete: apiClient.delete,
+  patch: apiClient.patch,
+  
   // Papers endpoints
   papers: {
     list(params = {}) {
@@ -59,18 +80,32 @@ export default {
     return apiClient.get('/stats')
   },
   
-  // Auth endpoints (for future use)
+  // Auth endpoints
   auth: {
-    login(credentials) {
-      return apiClient.post('/auth/login', credentials)
-    },
-    
-    logout() {
-      return apiClient.post('/auth/logout')
-    },
-    
     me() {
       return apiClient.get('/auth/me')
+    },
+    
+    profile() {
+      return apiClient.get('/auth/user/profile')
+    },
+    
+    adminTest() {
+      return apiClient.get('/auth/admin/test')
+    }
+  },
+  
+  // User endpoints
+  user: {
+    bookmarks() {
+      return apiClient.get('/user/bookmarks')
+    }
+  },
+  
+  // Admin endpoints
+  admin: {
+    triggerPipeline() {
+      return apiClient.post('/admin/pipeline/trigger')
     }
   }
 }

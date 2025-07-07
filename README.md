@@ -2,6 +2,10 @@
 
 A clean, modular Python application for automatically curating and summarizing research papers from ArXiv using AI/ML models.
 
+## 🔐 Security Notice
+
+**This application is now fully protected by Keycloak authentication.** All routes require authentication except health check endpoints. See [AUTH_CONFIG.md](AUTH_CONFIG.md) for detailed authentication documentation.
+
 ## Features
 
 - 🔍 **Automated Paper Discovery**: Fetches recent papers from ArXiv based on configured categories and keywords
@@ -9,6 +13,7 @@ A clean, modular Python application for automatically curating and summarizing r
 - 📊 **Relevance Scoring**: Scores papers based on relevance to your research interests
 - 🗄️ **PostgreSQL Storage**: Stores papers and summaries in a robust database
 - 🌐 **Web Interface**: Clean Flask-based web UI for browsing papers
+- 🔐 **Keycloak Authentication**: Secure access control with role-based permissions
 - 🔧 **Modular Architecture**: Clean, testable code following best practices
 
 ## Architecture
@@ -43,6 +48,7 @@ src/
 
 - Docker and Docker Compose
 - HuggingFace API token (get one at https://huggingface.co/settings/tokens)
+- Keycloak instance (included in docker-compose.yml)
 
 ### Setup
 
@@ -55,7 +61,7 @@ cd arxiv-curator
 2. Copy the example environment file and configure:
 ```bash
 cp .env.example .env
-# Edit .env and add your HF_TOKEN
+# Edit .env and add your HF_TOKEN and Keycloak configuration
 ```
 
 3. Start the services:
@@ -63,12 +69,30 @@ cp .env.example .env
 docker-compose up -d
 ```
 
+4. Initialize Keycloak (first time only):
+```bash
+./setup_keycloak.sh
+```
+
+5. Enable full authentication protection:
+```bash
+./enable_full_auth.sh
+```
+
 The application will:
 - Create a PostgreSQL database
+- Start Keycloak for authentication
 - Run the curation pipeline to fetch and process papers
-- Start a web interface at http://localhost:5000
+- Start a web interface at http://localhost:3000 (Vue.js frontend)
+- Start the API at http://localhost:5000 (Flask backend)
 
 ### Using the Application
+
+#### First Login
+1. Access http://localhost:3000
+2. You'll be redirected to Keycloak login
+3. Use the test credentials created by setup_keycloak.sh
+4. After login, you'll be redirected back to the application
 
 #### Running the Pipeline Manually
 
@@ -90,6 +114,28 @@ Open http://localhost:5000 in your browser to:
 - `GET /api/paper/<arxiv_id>` - Get specific paper
 - `GET /api/stats` - Get curation statistics
 
+## Authentication & Security
+
+The application uses Keycloak for authentication and authorization:
+
+- **All routes are protected** - Authentication is required for all endpoints
+- **Role-based access** - Admin features require admin role
+- **JWT tokens** - Secure token-based authentication
+- **Automatic token refresh** - Seamless user experience
+
+### Testing Authentication
+
+Run the authentication test suite:
+```bash
+./test_auth.sh
+```
+
+### Managing Users
+
+Users can be managed through the Keycloak admin console:
+- URL: http://localhost:8080/admin
+- Default admin: admin/admin (change in production!)
+
 ## Configuration
 
 ### Environment Variables
@@ -100,6 +146,11 @@ See `.env.example` for all available configuration options. Key settings:
 - **HuggingFace**: API token and model selection
 - **ArXiv**: Categories, keywords, and search parameters
 - **Processing**: Batch size, retry logic, scoring thresholds
+- **Keycloak**: Authentication server configuration
+  - `KEYCLOAK_REALM`: Realm name (default: arxiv-curator)
+  - `KEYCLOAK_CLIENT_ID`: Backend client ID
+  - `KEYCLOAK_CLIENT_SECRET`: Backend client secret
+  - `KEYCLOAK_SERVER_URL`: Keycloak server URL
 
 ### Customizing Paper Categories
 

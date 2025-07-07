@@ -3,27 +3,106 @@ version: '3.8'
 services:
   postgres-test:
     image: postgres:15-alpine
+    container_name: arxiv_postgres_test
     environment:
-      POSTGRES_DB: arxiv_curator_test
-      POSTGRES_USER: curator
-      POSTGRES_PASSWORD: testpassword
+      POSTGRES_DB: arxiv_test
+      POSTGRES_USER: test_curator
+      POSTGRES_PASSWORD: test_password
+      POSTGRES_INITDB_ARGS: "-E UTF8"
+    command: >
+      postgres
+      -c max_connections=200
+      -c shared_buffers=256MB
+      -c effective_cache_size=1GB
+    volumes:
+      - ./database/init:/docker-entrypoint-initdb.d
     ports:
       - "5433:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U test_curator -d arxiv_test"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    networks:
+      - e2e-test-network
 
-  tests:
-    build: .
-    depends_on:
-      - postgres-test
+  keycloak-test:
+    image: quay.io/keycloak/keycloak:23.0.7
+    container_name: arxiv_keycloak_test
     environment:
-      DATABASE_URL: postgresql://curator:testpassword@postgres-test:5432/arxiv_curator_test
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://postgres-test:5432/keycloak_test
+      KC_DB_USERNAME: keycloak
+      KC_DB_PASSWORD: keycloak_test
+      KC_HOSTNAME: localhost
+      KC_HOSTNAME_PORT: 8081
+      KC_HOSTNAME_STRICT: false
+      KC_HOSTNAME_STRICT_HTTPS: false
+      KC_HTTP_ENABLED: true
+      KC_HEALTH_ENABLED: true
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: test_admin
+      KC_LOG_LEVEL: INFO
+    ports:
+      - "8081:8080"
+    depends_on:
+      postgres-test:
+        condition: service_healthy
+    command: start-dev
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8080/health/ready || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    networks:
+      - e2e-test-network
+
+  web-test:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: arxiv_web_test
+    ports:
+      - "5001:5000"
+    depends_on:
+      postgres-test:
+        condition: service_healthy
+      keycloak-test:
+        condition: service_healthy
+    environment:
+      FLASK_ENV: testing
+      DATABASE_URL: postgresql://test_curator:test_password@postgres-test:5432/arxiv_test
       HF_TOKEN: ${HF_TOKEN}
+      HF_MODEL: facebook/bart-large-cnn
+      KEYCLOAK_URL: http://keycloak-test:8080
+      KEYCLOAK_REALM: arxiv-test
+      KEYCLOAK_CLIENT_ID: arxiv-backend
+      KEYCLOAK_CLIENT_SECRET: test-client-secret
+      KEYCLOAK_FRONTEND_CLIENT_ID: arxiv-frontend
+      JWT_ALGORITHM: RS256
+      SECRET_KEY: test-secret-key-for-e2e
       PYTHONUNBUFFERED: 1
+      # Test specific settings
+      TOKEN_EXPIRY_SECONDS: 60  # Short for testing token refresh
+      CORS_ORIGINS: "http://localhost:3000,http://localhost:3001"
     volumes:
       - ./src:/app/src
-      - ./tests:/app/tests
-      - ./coverage:/app/coverage
-    command: pytest -v --cov=src --cov-report=html:/app/coverage
+      - ./templates:/app/templates
+      - ./static:/app/static
+    command: python -m src.web_app
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:5000/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - e2e-test-network
 
 networks:
-  default:
-    name: arxiv-curator-test-network
+  e2e-test-network:
+    driver: bridge
+
+volumes:
+  postgres_test_data:
+  keycloak_test_data:

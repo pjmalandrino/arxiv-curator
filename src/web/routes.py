@@ -2,6 +2,7 @@
 
 from flask import Blueprint, render_template, jsonify, request, current_app
 from datetime import datetime, timedelta
+from ..auth import require_auth, require_admin, get_current_user
 
 papers_bp = Blueprint('papers', __name__)
 api_bp = Blueprint('api', __name__)
@@ -9,23 +10,33 @@ api_bp = Blueprint('api', __name__)
 
 @papers_bp.route('/')
 def index():
-    """Home page showing recent papers."""
-    return render_template('index.html')
+    """API info page."""
+    return jsonify({
+        'message': 'ArXiv Curator API',
+        'version': '1.0.0',
+        'endpoints': {
+            'papers': '/api/papers',
+            'stats': '/api/stats',
+            'auth': '/api/auth/me'
+        },
+        'frontend': 'http://localhost:3000'
+    })
 
 
 @papers_bp.route('/papers')
 def papers_list():
-    """List all papers."""
-    return render_template('papers.html')
+    """Redirect to API."""
+    return jsonify({'message': 'Use /api/papers for JSON data'})
 
 
 @papers_bp.route('/paper/<arxiv_id>')
 def paper_detail(arxiv_id):
-    """Show paper details."""
-    return render_template('paper_detail.html', arxiv_id=arxiv_id)
+    """Redirect to API."""
+    return jsonify({'message': f'Use /api/paper/{arxiv_id} for JSON data'})
 
 
 @api_bp.route('/papers', methods=['GET'])
+@require_auth
 def get_papers():
     """API endpoint to get papers.
     
@@ -75,6 +86,7 @@ def get_papers():
         return jsonify({'error': str(e)}), 500
 
 @api_bp.route('/paper/<arxiv_id>', methods=['GET'])
+@require_auth
 def get_paper(arxiv_id):
     """API endpoint to get a specific paper."""
     db_manager = current_app.config['db_manager']
@@ -92,6 +104,7 @@ def get_paper(arxiv_id):
 
 
 @api_bp.route('/stats', methods=['GET'])
+@require_auth
 def get_stats():
     """API endpoint to get curation statistics."""
     db_manager = current_app.config['db_manager']
@@ -104,8 +117,57 @@ def get_stats():
         return jsonify({
             'total_papers': total_papers,
             'recent_papers': recent_papers,
+            'average_score': 0.75,  # Placeholder value
             'last_update': datetime.utcnow().isoformat()
         })
         
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+
+@api_bp.route('/public/stats', methods=['GET'])
+def get_public_stats():
+    """Public API endpoint to get basic statistics."""
+    db_manager = current_app.config['db_manager']
+    
+    try:
+        # Get basic statistics that are safe to share publicly
+        total_papers = len(db_manager.get_recent_papers(days=365))
+        recent_papers = len(db_manager.get_recent_papers(days=7))
+        
+        return jsonify({
+            'total_papers': total_papers,
+            'recent_papers': recent_papers,
+            'last_update': datetime.utcnow().isoformat()
+        })
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@api_bp.route('/user/bookmarks', methods=['GET'])
+@require_auth
+def get_user_bookmarks():
+    """Get user's bookmarked papers."""
+    user = get_current_user()
+    
+    # Placeholder implementation
+    return jsonify({
+        'bookmarks': [],
+        'user_id': user.user_id,
+        'message': 'User bookmarks feature not implemented yet'
+    })
+
+
+@api_bp.route('/admin/pipeline/trigger', methods=['POST'])
+@require_admin
+def trigger_pipeline():
+    """Admin-only endpoint to trigger curation pipeline."""
+    user = get_current_user()
+    
+    # Placeholder implementation
+    return jsonify({
+        'message': 'Pipeline trigger requested',
+        'triggered_by': user.username,
+        'status': 'not_implemented'
+    })

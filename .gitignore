@@ -5,6 +5,7 @@ __pycache__/
 *.so
 .Python
 venv/
+venv_*/
 env/
 ENV/
 .venv
@@ -56,3 +57,6 @@ dist/
 *.tmp
 *.bak
 .cache/
+
+# Project specific
+clean_repository.py
